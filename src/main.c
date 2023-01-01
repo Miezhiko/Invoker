@@ -7,40 +7,40 @@
 #include <time.h>
 
 typedef struct Key {
-	SHORT keyIn;
-	SHORT keyOutSeq[4];
+  SHORT keyIn;
+  SHORT keyOutSeq[4];
   BOOL keyDown;
 } Key;
 
 VOID HandleKey(Key* key) {
-	if (GetAsyncKeyState(key->keyIn) && !key->keyDown) {
-		for (int i = 0; i < 4; i++) {
-			INPUT ip;
+  if (GetAsyncKeyState(key->keyIn) && !key->keyDown) {
+    for (int i = 0; i < 4; i++) {
+      INPUT ip;
 
-			ip.type           = INPUT_KEYBOARD;
-			ip.ki.time        = 0;
-			ip.ki.wVk         = 0;
-			ip.ki.dwExtraInfo = 0;
+      ip.type           = INPUT_KEYBOARD;
+      ip.ki.time        = 0;
+      ip.ki.wVk         = 0;
+      ip.ki.dwExtraInfo = 0;
 
-			ip.ki.dwFlags     = KEYEVENTF_SCANCODE;
-			ip.ki.wScan       = key->keyOutSeq[i];
+      ip.ki.dwFlags     = KEYEVENTF_SCANCODE;
+      ip.ki.wScan       = key->keyOutSeq[i];
 
-			Sleep(10 + (rand() % 10));
+      Sleep(10 + (rand() % 10));
 
-			SendInput(1, &ip, SIZE_OF_INPUT);
+      SendInput(1, &ip, SIZE_OF_INPUT);
 
-			Sleep(10 + (rand() % 10));
+      Sleep(10 + (rand() % 10));
 
-			ip.ki.dwFlags     = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-			SendInput(1, &ip, SIZE_OF_INPUT);
+      ip.ki.dwFlags     = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+      SendInput(1, &ip, SIZE_OF_INPUT);
 
-			Sleep(20 + (rand() % 25));
-		}
-		key->keyDown = TRUE;
-	}
-	if (!GetAsyncKeyState(key->keyIn) && key->keyDown) {
-		key->keyDown = FALSE;
-	}
+      Sleep(20 + (rand() % 25));
+    }
+    key->keyDown = TRUE;
+  }
+  if (!GetAsyncKeyState(key->keyIn) && key->keyDown) {
+    key->keyDown = FALSE;
+  }
 }
 
 INT WINAPI WinMain( _In_ HINSTANCE hInstance
@@ -101,16 +101,16 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
                  , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
                  };
 
-	while (1) {
-		for (int i = 0; i < 10; i++) {
+  while (1) {
+    for (int i = 0; i < 10; i++) {
       HandleKey(keys + i);
-		}
+    }
     if (GetAsyncKeyState(EXIT_KEY)) {
       if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
         break;
       }
     }
-	}
+  }
 
   if (MUTEX_HANDLE) {
     CloseHandle(MUTEX_HANDLE);
