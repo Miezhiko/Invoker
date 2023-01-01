@@ -112,6 +112,8 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
     }
   }
 
+  if (WINDOW) DestroyWindow(WINDOW);
+
   if (MUTEX_HANDLE) {
     CloseHandle(MUTEX_HANDLE);
     ReleaseMutex(MUTEX_HANDLE);
