@@ -112,7 +112,10 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
     }
   }
 
-  if (WINDOW) DestroyWindow(WINDOW);
+  if (WINDOW) {
+    RemoveTrayIcon(WINDOW, 1);
+    DestroyWindow(WINDOW);
+  }
 
   if (MUTEX_HANDLE) {
     CloseHandle(MUTEX_HANDLE);

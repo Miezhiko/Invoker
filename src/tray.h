@@ -28,14 +28,9 @@ void AddTrayIcon( HWND hWnd, UINT uID, UINT uCallbackMsg, UINT uIcon ) {
 }
 
 static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) { 
-  switch (uMsg) {
-    case WM_CREATE:
-      AddTrayIcon( hWnd, 1, WM_APP, 0 );
-      return 0;
-    case WM_CLOSE:
-      RemoveTrayIcon( hWnd, 1 );
-      PostQuitMessage( 0 );
-      return DefWindowProcW( hWnd, uMsg, wParam, lParam );
+  if (uMsg == WM_CREATE) {
+    AddTrayIcon( hWnd, 1, WM_APP, 0 );
+    return 0;
   }
 
   return DefWindowProcW( hWnd, uMsg, wParam, lParam );
