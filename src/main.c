@@ -62,7 +62,7 @@ DWORD WINAPI HandleInvokerKeys(LPVOID _lpParameter) {
     for (int i = 0; i < 10; i++) {
       HandleKey(keys + i);
     }
-    if (GetAsyncKeyState(EXIT_KEY)) {
+    if (GetAsyncKeyState(VK_BACK)) {
       if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
         if (WINDOW)
           PostMessage( WINDOW, WM_CLOSE, 0, 0 );
