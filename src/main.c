@@ -43,6 +43,38 @@ VOID HandleKey(Key* key) {
   }
 }
 
+DWORD WINAPI HandleInvokerKeys(LPVOID _lpParameter) {
+  srand(time(NULL));
+
+  Key keys[10] = { { VK_NUMPAD7, { 0x10, 0x10, 0x10, 0x13 } }
+                , { VK_NUMPAD4, { 0x10, 0x10, 0x11, 0x13 } }
+                , { VK_NUMPAD1, { 0x10, 0x10, 0x12, 0x13 } }
+                , { VK_NUMPAD8, { 0x11, 0x11, 0x11, 0x13 } }
+                , { VK_NUMPAD5, { 0x11, 0x11, 0x10, 0x13 } }
+                , { VK_NUMPAD2, { 0x11, 0x11, 0x12, 0x13 } }
+                , { VK_NUMPAD9, { 0x12, 0x12, 0x12, 0x13 } }
+                , { VK_NUMPAD6, { 0x12, 0x12, 0x10, 0x13 } }
+                , { VK_NUMPAD3, { 0x12, 0x12, 0x11, 0x13 } }
+                , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
+                };
+
+  while (1) {
+    for (int i = 0; i < 10; i++) {
+      HandleKey(keys + i);
+    }
+    if (GetAsyncKeyState(EXIT_KEY)) {
+      if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
+        if (WINDOW)
+          PostMessage( WINDOW, WM_CLOSE, 0, 0 );
+        else PostQuitMessage(0);
+        break;
+      }
+    }
+  }
+
+  return 0;
+}
+
 INT WINAPI WinMain( _In_ HINSTANCE hInstance
                   , _In_opt_ HINSTANCE hPrevInstance
                   , _In_ LPSTR lpCmdLine
@@ -82,35 +114,34 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
                             , TEXT(L"Title"), WS_OVERLAPPEDWINDOW
                             , 0, 0, 0, 0, NULL, NULL, hInstance, NULL );
     if ( !WINDOW ) {
-      MessageBoxW(NULL, L"Can't create window!", TEXT(L"Warning!"), MB_ICONERROR | MB_OK | MB_TOPMOST);
+      MessageBoxW( NULL, L"Can't create window!", TEXT(L"Error!")
+                 , MB_ICONERROR | MB_OK | MB_TOPMOST );
       return 1;
     }
   }
 
-  srand(time(NULL));
-
-  Key keys[10] = { { VK_NUMPAD7, { 0x10, 0x10, 0x10, 0x13 } }
-                 , { VK_NUMPAD4, { 0x10, 0x10, 0x11, 0x13 } }
-                 , { VK_NUMPAD1, { 0x10, 0x10, 0x12, 0x13 } }
-                 , { VK_NUMPAD8, { 0x11, 0x11, 0x11, 0x13 } }
-                 , { VK_NUMPAD5, { 0x11, 0x11, 0x10, 0x13 } }
-                 , { VK_NUMPAD2, { 0x11, 0x11, 0x12, 0x13 } }
-                 , { VK_NUMPAD9, { 0x12, 0x12, 0x12, 0x13 } }
-                 , { VK_NUMPAD6, { 0x12, 0x12, 0x10, 0x13 } }
-                 , { VK_NUMPAD3, { 0x12, 0x12, 0x11, 0x13 } }
-                 , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
-                 };
-
-  while (1) {
-    for (int i = 0; i < 10; i++) {
-      HandleKey(keys + i);
-    }
-    if (GetAsyncKeyState(EXIT_KEY)) {
-      if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
-        break;
-      }
-    }
+  HANDLE hThread = CreateThread(
+      NULL,
+      0,
+      HandleInvokerKeys,
+      NULL,
+      0,
+      NULL);
+  if (hThread == NULL) {
+      MessageBoxW( NULL, L"Can't create thread!", TEXT(L"Error!")
+                 , MB_ICONERROR | MB_OK | MB_TOPMOST );
+      return 1;
   }
+
+  BOOL bRet; 
+  MSG msg;
+  while( ( bRet = GetMessageW(&msg, NULL, 0, 0) ) != 0 )
+    if (bRet != -1)  {
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
+    }
+
+  CloseHandle(hThread);
 
   if (WINDOW) {
     RemoveTrayIcon(WINDOW, 1);
