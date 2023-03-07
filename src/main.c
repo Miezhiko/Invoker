@@ -14,7 +14,9 @@ typedef struct Key {
 
 VOID HandleKey(Key* key) {
   if (GetAsyncKeyState(key->keyIn) && !key->keyDown) {
-    for (int i = 0; i < 4; i++) {
+    if (!HOTKEYS_ON) {
+      Sleep(100);
+    } else for (int i = 0; i < 4; i++) {
       INPUT ip;
 
       ip.type           = INPUT_KEYBOARD;
@@ -62,7 +64,10 @@ DWORD WINAPI HandleInvokerKeys(LPVOID _lpParameter) {
     for (int i = 0; i < 10; i++) {
       HandleKey(keys + i);
     }
-    if (GetAsyncKeyState(VK_BACK)) {
+    if (GetAsyncKeyState(VK_SCROLL)) {
+      HOTKEYS_ON = !HOTKEYS_ON;
+      Sleep(100);
+    } else if (GetAsyncKeyState(VK_BACK)) {
       if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
         if (WINDOW)
           PostMessage( WINDOW, WM_CLOSE, 0, 0 );
@@ -85,6 +90,12 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
     keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
     keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
   }
+
+  // Turn on Scroll lock
+  if (!(GetKeyState(VK_SCROLL) & 0x0001)) {
+    keybd_event(VK_SCROLL, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
+    keybd_event(VK_SCROLL, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+  } else HOTKEYS_ON = TRUE;
 
   MUTEX_HANDLE = CreateMutexW(NULL, TRUE, MUTEX_NAME);
   if(ERROR_ALREADY_EXISTS == GetLastError()) return 1;
@@ -142,6 +153,12 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
     }
 
   CloseHandle(hThread);
+
+  // Turn off Scroll Lock
+  if (GetKeyState(VK_SCROLL) & 0x0001) {
+    keybd_event(VK_SCROLL, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
+    keybd_event(VK_SCROLL, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+  }
 
   if (WINDOW) {
     RemoveTrayIcon(WINDOW, 1);

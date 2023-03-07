@@ -1,6 +1,11 @@
 # Invoker
 
-nupads casts
+spell switching by nupad keys
+
+ - tray icon with menu
+ - ctrl+break to exit
+ - scroll lock to turn on/off
+ - scroll lock indicates whether it's active
 
 ```c
   Key keys[10] = { { VK_NUMPAD7, { 0x10, 0x10, 0x10, 0x13 } }
@@ -15,6 +20,3 @@ nupads casts
                  , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
                  };
 ```
-
-Ctrl+Break to Exit
-==================
