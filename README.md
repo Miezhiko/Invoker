@@ -1,5 +1,7 @@
 # Invoker
 
+[![CMake CI](https://github.com/Miezhiko/Invoker/actions/workflows/cmake.yml/badge.svg)](https://github.com/Miezhiko/Invoker/actions/workflows/cmake.yml)
+
 spell switching by nupad keys
 
  - tray icon with menu
