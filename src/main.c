@@ -1,4 +1,4 @@
-#pragma optimize( "ty", on )
+#pragma optimize( "t", on )
 
 #include "stdafx.h"   // include system headers
 #include "static.h"   // static variables and constants
@@ -9,7 +9,7 @@
 typedef struct Key {
   SHORT keyIn;
   SHORT keyOutSeq[4];
-  BOOL keyDown;
+  BOOL  keyDown;
 } Key;
 
 VOID HandleKey(Key* key) {
@@ -46,34 +46,34 @@ VOID HandleKey(Key* key) {
 }
 
 DWORD WINAPI HandleInvokerKeys(LPVOID _lpParameter) {
-  srand(time(NULL));
+  #pragma warning(push)
+  #pragma warning(disable: 4100)
+  UNREFERENCED_PARAMETER(_lpParameter);
+  #pragma warning(pop)
 
-  Key keys[10] = { { VK_NUMPAD7, { 0x10, 0x10, 0x10, 0x13 } }
-                , { VK_NUMPAD4, { 0x10, 0x10, 0x11, 0x13 } }
-                , { VK_NUMPAD1, { 0x10, 0x10, 0x12, 0x13 } }
-                , { VK_NUMPAD8, { 0x11, 0x11, 0x11, 0x13 } }
-                , { VK_NUMPAD5, { 0x11, 0x11, 0x10, 0x13 } }
-                , { VK_NUMPAD2, { 0x11, 0x11, 0x12, 0x13 } }
-                , { VK_NUMPAD9, { 0x12, 0x12, 0x12, 0x13 } }
-                , { VK_NUMPAD6, { 0x12, 0x12, 0x10, 0x13 } }
-                , { VK_NUMPAD3, { 0x12, 0x12, 0x11, 0x13 } }
-                , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
-                };
+  srand((unsigned int)time(NULL));
 
+  Key keys[10] =
+    { { VK_NUMPAD7, { 0x10, 0x10, 0x10, 0x13 } }
+    , { VK_NUMPAD4, { 0x10, 0x10, 0x11, 0x13 } }
+    , { VK_NUMPAD1, { 0x10, 0x10, 0x12, 0x13 } }
+    , { VK_NUMPAD8, { 0x11, 0x11, 0x11, 0x13 } }
+    , { VK_NUMPAD5, { 0x11, 0x11, 0x10, 0x13 } }
+    , { VK_NUMPAD2, { 0x11, 0x11, 0x12, 0x13 } }
+    , { VK_NUMPAD9, { 0x12, 0x12, 0x12, 0x13 } }
+    , { VK_NUMPAD6, { 0x12, 0x12, 0x10, 0x13 } }
+    , { VK_NUMPAD3, { 0x12, 0x12, 0x11, 0x13 } }
+    , { VK_NUMPAD0, { 0x10, 0x11, 0x12, 0x13 } }
+    };
+
+  int i;
   while (1) {
-    for (int i = 0; i < 10; i++) {
+    for (i = 0; i < 10; ++i) {
       HandleKey(keys + i);
     }
     if (GetAsyncKeyState(VK_SCROLL)) {
       HOTKEYS_ON = !HOTKEYS_ON;
       Sleep(100);
-    } else if (GetAsyncKeyState(VK_BACK)) {
-      if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
-        if (WINDOW)
-          PostMessage( WINDOW, WM_CLOSE, 0, 0 );
-        else PostQuitMessage(0);
-        break;
-      }
     }
   }
 
@@ -81,9 +81,15 @@ DWORD WINAPI HandleInvokerKeys(LPVOID _lpParameter) {
 }
 
 INT WINAPI WinMain( _In_ HINSTANCE hInstance
-                  , _In_opt_ HINSTANCE hPrevInstance
-                  , _In_ LPSTR lpCmdLine
-                  , _In_ int nShowCmd ) {
+                  , _In_opt_ HINSTANCE _hPrevInstance
+                  , _In_ LPSTR _lpCmdLine
+                  , _In_ int _nShowCmd ) {
+  #pragma warning(push)
+  #pragma warning(disable: 4100)
+  UNREFERENCED_PARAMETER(_hPrevInstance);
+  UNREFERENCED_PARAMETER(_lpCmdLine);
+  UNREFERENCED_PARAMETER(_nShowCmd);
+  #pragma warning(pop)
 
   // Turn on Num Lock before mutex check so even if are running already enable Num Lock
   if (!(GetKeyState(VK_NUMLOCK) & 0x0001)) {
@@ -111,7 +117,7 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
     wclx.cbClsExtra     = 0;
     wclx.cbWndExtra     = 0;
     wclx.hInstance      = hInstance;
-    wclx.hCursor        = LoadCursorW( NULL, MAKEINTRESOURCEW(IDC_ARROW) );
+    wclx.hCursor        = LoadCursor( NULL, IDC_ARROW );
     wclx.hbrBackground  = (HBRUSH)( COLOR_BTNFACE + 1 );   
 
     wclx.lpszMenuName   = NULL;
@@ -122,10 +128,10 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
 
   {
     WINDOW = CreateWindowExW( 0, MUTEX_NAME
-                            , TEXT(L"Title"), WS_OVERLAPPEDWINDOW
+                            , TEXT(MUTEX_NAME), WS_OVERLAPPEDWINDOW
                             , 0, 0, 0, 0, NULL, NULL, hInstance, NULL );
     if ( !WINDOW ) {
-      MessageBoxW( NULL, L"Can't create window!", TEXT(L"Error!")
+      MessageBoxW( NULL, L"Can't create window!", TEXT(MUTEX_NAME)
                  , MB_ICONERROR | MB_OK | MB_TOPMOST );
       return 1;
     }
@@ -139,18 +145,19 @@ INT WINAPI WinMain( _In_ HINSTANCE hInstance
       0,
       NULL);
   if (hThread == NULL) {
-      MessageBoxW( NULL, L"Can't create thread!", TEXT(L"Error!")
+      MessageBoxW( NULL, L"Can't create thread!", TEXT(MUTEX_NAME)
                  , MB_ICONERROR | MB_OK | MB_TOPMOST );
       return 1;
   }
 
   BOOL bRet; 
   MSG msg;
-  while( ( bRet = GetMessageW(&msg, NULL, 0, 0) ) != 0 )
+  while( ( bRet = GetMessageW(&msg, NULL, 0, 0) ) != 0 ) {
     if (bRet != -1)  {
       TranslateMessage(&msg);
       DispatchMessageW(&msg);
     }
+  }
 
   CloseHandle(hThread);
 

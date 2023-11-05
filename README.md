@@ -5,7 +5,6 @@
 spell switching by nupad keys
 
  - tray icon with menu
- - ctrl+break to exit
  - scroll lock to turn on/off
  - scroll lock indicates whether it's active
 
